@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.HouchuDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.username as username
+        ,a.password as password
+        ,a.houchu_name as houchuName
+        ,a.sex_types as sexTypes
+        ,a.houchu_id_number as houchuIdNumber
+        ,a.houchu_phone as houchuPhone
+        ,a.houchu_photo as houchuPhoto
+        ,a.houchu_delete as houchuDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.HouchuView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM houchu  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and a.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and a.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test=" params.houchuName != '' and params.houchuName != null and params.houchuName != 'null' ">
+                and a.houchu_name like CONCAT('%',#{params.houchuName},'%')
+            </if>
+            <if test="params.sexTypes != null and params.sexTypes != ''">
+                and a.sex_types = #{params.sexTypes}
+            </if>
+            <if test=" params.houchuIdNumber != '' and params.houchuIdNumber != null and params.houchuIdNumber != 'null' ">
+                and a.houchu_id_number like CONCAT('%',#{params.houchuIdNumber},'%')
+            </if>
+            <if test=" params.houchuPhone != '' and params.houchuPhone != null and params.houchuPhone != 'null' ">
+                and a.houchu_phone like CONCAT('%',#{params.houchuPhone},'%')
+            </if>
+            <if test="params.houchuDeleteStart != null and params.houchuDeleteStart != ''">
+                <![CDATA[  and a.houchu_delete >= #{params.houchuDeleteStart}   ]]>
+            </if>
+            <if test="params.houchuDeleteEnd != null and params.houchuDeleteEnd != ''">
+                <![CDATA[  and a.houchu_delete <= #{params.houchuDeleteEnd}   ]]>
+            </if>
+             <if test="params.houchuDelete != null and params.houchuDelete != ''">
+                and a.houchu_delete = #{params.houchuDelete}
+             </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
